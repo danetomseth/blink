@@ -10,13 +10,11 @@ app.directive('corners', function() {
                 console.log("Left", scope.lefteyeX.toFixed(1),scope.lefteyeY.toFixed(1))
                 //console.log("Right",scope.righteyeX.toFixed(1),scope.righteyeY.toFixed(1))
             }
-            let zero = []
+            let zero = [];
+            let zeroBrow = [];
             scope.zero = function(){
                 zero=[scope.eyeX, scope.eyeY]
-                console.log(zero)
             }
-
-
 
             //initiates webcam
             navigator.getUserMedia = navigator.getUserMedia ||
@@ -51,45 +49,57 @@ app.directive('corners', function() {
             var canvas = document.getElementById("canvas");
             var context = canvas.getContext("2d");
 
-            scope.box = [0, 0, 0, 0, 0, 0, 0, 0]
+            scope.box = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+            var scopeInterval;
+
+            document.addEventListener('click', function() {
+                console.log("EYEX is", scope.xDiff)
+                console.log("EYEY is", scope.yDiff)
+            })
 
             function eyePosition(){
-                var xDiff = scope.eyeX - zero[0];
+                var xDiff = zero[0] - scope.eyeX;
                 var yDiff = zero[1] - scope.eyeY;
-                var thresholdX = 0;
-                var thresholdY = 0;
-                scope.eyeDiff = xDiff
-                if(xDiff < 0 && Math.abs(yDiff) < thresholdY) {
-                    scope.box = [0, 0, 0, 1, 0, 0, 0, 0]
+                var thresholdX = 4;
+                var thresholdY = 3;
+                var threshold = 100;
+                scope.xDiff = xDiff.toFixed(1);
+                scope.yDiff = yDiff.toFixed(1);
+
+                if (Math.abs(xDiff) < thresholdX) {
+                    scope.box = [0, 0, 0, 0, 1, 0, 0, 0, 0]
+                } else if(xDiff < 0 && yDiff > 0){// LEFT TOP
+                    scope.box = [1, 0, 0, 0, 0, 0, 0, 0, 0]
+                } else if(xDiff > 0 && yDiff > 0){ // RIGHT TOP
+                    scope.box = [0, 0, 1, 0, 0, 0, 0, 0, 0]
+                } else if(xDiff > 0 && yDiff < 0){ // BOTTOM RIGHT
+                    scope.box = [0, 0, 0, 0, 0, 0, 0, 0, 1]
+                } else if(xDiff < 0 && yDiff < 0){ // BOTTOM LEFT
+                    scope.box = [0, 0, 0, 0, 0, 0, 1, 0, 0]
                 }
-                else if(xDiff > 0 && Math.abs(yDiff) < thresholdY) {
-                    scope.box = [0, 0, 0, 0, 0, 0, 0, 1]
-                }
-                else if(xDiff < 0 && yDiff > 0){
-                    if (Math.abs(xDiff) < thresholdX) {
-                        scope.box = [0, 1, 0, 0, 0, 0, 0, 0]
-                    }
-                    else scope.box = [0, 0, 1, 0, 0, 0, 0, 0]
+            }
 
-                } else if(xDiff > 0 && yDiff > 0){
-                    if (Math.abs(xDiff) < thresholdX) {
-                        scope.box = [0, 1, 0, 0, 0, 0, 0, 0]
-                    }
-                    else scope.box = [1, 0, 0, 0, 0, 0, 0, 0]
+            // brow selection
+            function browSelect(){
+                // var xDiff = zero[0] - scope.eyeX;
+                // var yDiff = zero[1] - scope.eyeY;
+                var thresholdX = 4;
+                var thresholdY = 3;
+                var threshold = 100;
+                scope.xDiff = xDiff.toFixed(1);
+                scope.yDiff = yDiff.toFixed(1);
 
-                } else if(xDiff > 0 && yDiff < 0){
-                    if (Math.abs(xDiff) < thresholdX) {
-                        scope.box = [0, 0, 0, 1, 0, 0, 0, 0]
-                    }
-                    else scope.box = [0, 0, 0, 0, 1, 0, 0, 0]
-
-                } else if(xDiff < 0 && yDiff < 0){
-                    if (Math.abs(xDiff) < thresholdX) {
-                        scope.box = [0, 0, 0, 0, 0, 1, 0, 0]
-                    }
-                    else scope.box = [0, 0, 0, 0, 0, 0, 1, 0]
-
+                if (Math.abs(xDiff) < thresholdX) {
+                    scope.box = [0, 0, 0, 0, 1, 0, 0, 0, 0]
+                } else if(xDiff < 0 && yDiff > 0){// LEFT TOP
+                    scope.box = [1, 0, 0, 0, 0, 0, 0, 0, 0]
+                } else if(xDiff > 0 && yDiff > 0){ // RIGHT TOP
+                    scope.box = [0, 0, 1, 0, 0, 0, 0, 0, 0]
+                } else if(xDiff > 0 && yDiff < 0){ // BOTTOM RIGHT
+                    scope.box = [0, 0, 0, 0, 0, 0, 0, 0, 1]
+                } else if(xDiff < 0 && yDiff < 0){ // BOTTOM LEFT
+                    scope.box = [0, 0, 0, 0, 0, 0, 1, 0, 0]
                 }
             }
 
@@ -98,15 +108,12 @@ app.directive('corners', function() {
                 requestAnimationFrame(positionLoop);
                 var positions = ctracker.getCurrentPosition();
                 if(positions) {
-                    // scope.lefteyeX = positions[27][0]// - positions[37][0];
-                    // scope.lefteyeY = positions[27][1]//- positions[37][1];
-                    // scope.righteyeX = positions[32][0]//- positions[37][0];
-                    // scope.righteyeY = positions[32][1]//- positions[37][1];
                     scope.eyeX = positions[27][0] + positions[32][0]
                     scope.eyeY = positions[27][1] + positions[32][1]
+                    scope.brows = positions[20][0] + positions[17][0];
                     eyePosition();
+                    browSelect();
                     scope.$digest();
-
                 }
             }
 

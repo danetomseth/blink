@@ -66,8 +66,6 @@ app.directive('gridVideo', function(BlinkFactory2) {
             var rightArray = [23, 63, 24, 64, 25, 65, 26, 66];
             var leftArray = [28, 67, 29, 68, 30, 69, 31, 70];
 
-
-
             //initiates webcam
             navigator.getUserMedia = navigator.getUserMedia ||
                 navigator.webkitGetUserMedia ||
