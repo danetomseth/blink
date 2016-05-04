@@ -14,6 +14,7 @@ app.directive('corners', function() {
             let zeroBrow = [];
             scope.zero = function(){
                 zero=[scope.eyeX, scope.eyeY]
+                zeroBrow = [scope.brows]
             }
 
             //initiates webcam
@@ -82,24 +83,9 @@ app.directive('corners', function() {
 
             // brow selection
             function browSelect(){
-                // var xDiff = zero[0] - scope.eyeX;
-                // var yDiff = zero[1] - scope.eyeY;
-                var thresholdX = 4;
-                var thresholdY = 3;
-                var threshold = 100;
-                scope.xDiff = xDiff.toFixed(1);
-                scope.yDiff = yDiff.toFixed(1);
-
-                if (Math.abs(xDiff) < thresholdX) {
-                    scope.box = [0, 0, 0, 0, 1, 0, 0, 0, 0]
-                } else if(xDiff < 0 && yDiff > 0){// LEFT TOP
-                    scope.box = [1, 0, 0, 0, 0, 0, 0, 0, 0]
-                } else if(xDiff > 0 && yDiff > 0){ // RIGHT TOP
-                    scope.box = [0, 0, 1, 0, 0, 0, 0, 0, 0]
-                } else if(xDiff > 0 && yDiff < 0){ // BOTTOM RIGHT
-                    scope.box = [0, 0, 0, 0, 0, 0, 0, 0, 1]
-                } else if(xDiff < 0 && yDiff < 0){ // BOTTOM LEFT
-                    scope.box = [0, 0, 0, 0, 0, 0, 1, 0, 0]
+                var browChange = scope.brows - zeroBrow[0];
+                if (browChange > 25) {
+                    // select something
                 }
             }
 
